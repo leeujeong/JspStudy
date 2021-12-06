@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="dao.free">
+	
+	<select id="selectFreeList" parameterType="Map" resultType="dto.Free" >
+		SELECT B.RN, B.fno, B.writer, B.content, B.ip, B.hit, B.created, B.lastmodified, B.state, B.depth, B.groupno, B.groupord
+		  FROM (SELECT ROWNUM AS RN, A.fno, A.writer, A.content, A.ip, A.hit, A.created, A.lastmodified, A.state, A.depth, A.groupno, A.groupord
+		  		  FROM (SELECT fno, writer, content, ip, hit, created, lastmodified, state, depth, groupno, groupord
+		  		  		  FROM free
+		  		  		 ORDER BY GROUPNO DESC, GROUPORD ASC )A )B
+		 WHERE B.RN BETWEEN #{beginRecord} AND #{endRecord}
+	</select>
+	
+	<select id="getTotalCount"  resultType="int">
+		SELECT count(*)
+		  FROM free
+	</select>
+	
+	<insert id="insertFree" parameterType="dto.Free">
+		INSERT INTO FREE
+		VALUES(free_seq.nextval, #{writer}, #{content}, #{ip}, 0, SYSDATE, SYSDATE, 0, 0, free_seq.currval,0)
+	</insert>
+	
+	<select id="selectFreeByfNo" parameterType="Long" resultType="dto.Free">
+		SELECT fno, writer, content, ip, hit, created, lastmodified, state, depth, groupno, groupord
+		  FROM free
+		 WHERE fno = #{fNo}
+	</select>
+	
+	<update id="updateHit" parameterType="Long">
+		UPDATE free SET hit = hit + 1
+		 WHERE fno = #{fNo}
+	</update>
+	
+	<update id="updateFree" parameterType="dto.Free">
+		UPDATE free 
+		   SET content = #{content}, lastmodified = SYSDATE
+		 WHERE fno = #{fNo}
+	</update>
+	
+	<update id="deleteFree" parameterType="Long">
+		UPDATE free
+		   SET state = -1
+		 WHERE fno = #{fNo}
+	</update>
+	
+	<insert id="insertReplyeFree" parameterType="dto.Free">
+		INSERT INTO FREE
+		VALUES(free_seq.nextval, #{writer}, #{content}, #{ip}, 0, SYSDATE, SYSDATE, 0, #{depth}, #{groupNo},#{groupOrd})
+	</insert>
+	
+	<update id="updatePreviousReplyGroupOrd" parameterType="dto.Free">
+		UPDATE free
+		   SET GROUPORD = GROUPORD + 1
+		 WHERE GROUPNO = #{groupNo}		<!-- 같은 groupNo인가? -->
+		   AND GROUPORD > #{groupOrd}	<!-- 원글의 groupOrd보다 큰 댓글인가? -->
+	</update>
+	
+	<select id="findFree" parameterType="Map" resultType="dto.Free">
+		SELECT B.RN, B.fno, B.writer, B.content, B.ip, B.hit, B.created, B.lastmodified, B.state, B.depth, B.groupno, B.groupord
+		  FROM (SELECT ROWNUM AS RN, A.fno, A.writer, A.content, A.ip, A.hit, A.created, A.lastmodified, A.state, A.depth, A.groupno, A.groupord
+		  		  FROM (SELECT fno, writer, content, ip, hit, created, lastmodified, state, depth, groupno, groupord
+		  		  		  FROM free
+		  		  		 WHERE state = 0
+		  		  		   AND <if test="column != ALL">${column} LIKE #{query}</if>
+		 	   				   <if test="column == ALL">(WRITER LIKE #{query} OR CONTENT LIKE #{query})</if>
+		  		  		 ORDER BY GROUPNO DESC, GROUPORD ASC )A )B
+		 WHERE B.RN BETWEEN #{beginRecord} AND #{endRecord}
+		   
+	</select>
+	
+	<select id="selectFindCount" parameterType="Map" resultType="int">
+		SELECT COUNT(*)
+		  FROM free
+		 WHERE state = 0
+		   AND <if test="column != ALL">${column} LIKE #{query}</if>
+		 	   <if test="column == ALL">(WRITER LIKE #{query} OR CONTENT LIKE #{query})</if>
+	</select>
+</mapper>
