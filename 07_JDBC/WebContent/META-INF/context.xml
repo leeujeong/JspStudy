@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<context>
+<!-- Oracle 11g Express Edition -->
+<Resource 
+	name="jdbc/oracle11g"
+	type="javax.sql.DataSource"
+	dirverClassName="oracle.jdbc.driver.OracleDriver"
+	url="jdbc:oracle:thin:@localhost:1521:xe"
+	username="scott"
+	password="1111"
+	maxTotal="8"
+	maxIdel="2"
+	maxWaitMaillis="5000"/>
+	
+</context>
