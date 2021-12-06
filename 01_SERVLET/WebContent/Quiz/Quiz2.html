@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+		<!-- 편지쓰기 
+		작성일은 현재날짜가 자동으로 입력된다.
+		편지 작성하기 버틍을 클리갛면 보내는 사람.txt파일이 생성된다.
+		-->
+	<form>
+		<input type="text" name="date" id="date" readonly>
+		<br>
+		<input type="text" name="from" id="from" placeholder="작성자" >
+		<br>
+		<input type="text" name="to" id="to" placeholder="받는사람">
+		<br>
+		<textarea name="content" placeholder="내용"></textarea>
+		<input type="button" value="편지작성하기" id="btn">
+	</form>		 
+	<script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+	<script>
+		let today = new Date();
+		today = today.getFullYear() + '-' + (today.getMonth()+1) + '-' + today.getDate();
+		$('#date').val(today);
+		$('#btn').on('click', function(){
+			$('form').attr('method', 'post');
+			$('form').attr('action', '/01_SERVLET/Quiz2');
+			$('form').submit();
+		})
+	</script>
+	
+
+</body>
+</html>
